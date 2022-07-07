@@ -1,3 +1,4 @@
+using BuildNumberGenerator.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuildNumberGenerator.Controllers
@@ -8,15 +9,18 @@ namespace BuildNumberGenerator.Controllers
 	{ 
         private ILogger<GetBuildNumberController> _logger;
 
-        public GetBuildNumberController(ILogger<GetBuildNumberController> logger)
+        private IGenerator _generator;
+
+        public GetBuildNumberController(ILogger<GetBuildNumberController> logger, IGenerator generator)
         {
             _logger = logger;
+            _generator = generator;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            return new OkResult();
+            return new OkObjectResult(_generator.GetNextBuildNumber("", ""));
         }
     }
 }
