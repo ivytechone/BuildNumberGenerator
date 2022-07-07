@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project( "BuildNumberGenerator\BuildNumberGenerator.csproj", "{F2FE2AFE-DFFC-414E-8313-7ADD660CE99B}"
+Project("{E27C9793-466A-4419-8A6D-71AF5C86ADD1}") = "BuildNumberGenerator", "BuildNumberGenerator\BuildNumberGenerator.csproj", "{F2FE2AFE-DFFC-414E-8313-7ADD660CE99B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
