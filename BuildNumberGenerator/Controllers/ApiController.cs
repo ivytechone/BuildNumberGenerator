@@ -27,8 +27,8 @@ namespace BuildNumberGenerator.Controllers
                 throw new ArgumentNullException("id");
             }
             
-            // hard code to PTC for my own testing.
-            return new OkObjectResult(_generator.GetNextBuildNumber(id.Id, branch, TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");));
+            // hard code to PST for my own testing.
+            return new OkObjectResult(_generator.GetNextBuildNumber(id.Id, branch, TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles")));
 
         }
 
