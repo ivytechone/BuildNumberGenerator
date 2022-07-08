@@ -1,0 +1,28 @@
+name: Build and Push
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  buildandpush:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set build number
+      run: echo BUILDNUM=$GITHUB_REF_NAME.$(TZ=America/Los_Angeles date +%Y%m%d).$GITHUB_RUN_NUMBER >> $GITHUB_ENV
+    - name: Show build number
+      run: echo "Build Number is ${{ env.BUILDNUM }}"
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release --no-restore
+    - name: Unit test
+      run: dotnet test -c Release
+    - name: Create docker image
+      run: docker build -t ivytechone/buildnumbergenerator:${{ env.BUILDNUM }} .
+    - name: Docker login
+      run: docker login -u ivytechone -p ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Push docker image
+      run: docker push -a ivytechone/buildnumbergenerator
