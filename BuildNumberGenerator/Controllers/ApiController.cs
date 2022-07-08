@@ -18,7 +18,7 @@ namespace BuildNumberGenerator.Controllers
         [UseAuthorization]
         [HttpGet]
         [Route("getBuildNumber/")]
-        public IActionResult GetBuildNumber()
+        public IActionResult GetBuildNumber([FromQuery] string branch)
         {
             Identity? id = AuthenticationHelper.GetAuthenticatedIdentity(this.HttpContext);
 
@@ -27,7 +27,7 @@ namespace BuildNumberGenerator.Controllers
                 throw new ArgumentNullException("id");
             }
             
-            return new OkObjectResult(_generator.GetNextBuildNumber(id.Id, "", TimeZoneInfo.Utc));
+            return new OkObjectResult(_generator.GetNextBuildNumber(id.Id, branch, TimeZoneInfo.Utc));
 
         }
 
