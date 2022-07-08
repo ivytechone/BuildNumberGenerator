@@ -1,12 +1,16 @@
 using Xunit;
 using BuildNumberGenerator;
+using Xunit.Abstractions;
 
 public class GeneratorTests
 {
-    public GeneratorTests()
+    private readonly ITestOutputHelper _output;
+
+    public GeneratorTests(ITestOutputHelper output)
     {
         timeProvider = new MockTimeProvider("2022-01-01T12:00Z");
         generator = new Generator(timeProvider);
+        _output = output;
     }
 
     private readonly IGenerator generator;
@@ -53,7 +57,15 @@ public class GeneratorTests
     {
         var localTime = new DateTime(2022, 1, 1, 23, 59, 00, DateTimeKind.Unspecified);
         TimeZoneInfo tzPST = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
+        _output.WriteLine("\nDEBUG--tzPST---");
+        _output.WriteLine(tzPST.ToSerializedString());
+        _output.WriteLine("DEBUG--tzPST---\n");
+
         var UTCTime = TimeZoneInfo.ConvertTimeToUtc(localTime, tzPST);
+
+        _output.WriteLine("\nDEBUG--UTCTime---");
+        _output.WriteLine(UTCTime.ToString());
+        _output.WriteLine("DEBUG--UTCTime---\n");
 
         timeProvider.SetMockTimeUTC(UTCTime);
         Assert.Equal("branch1.20220101.1", generator.GetNextBuildNumber("id1", "branch1", TimeZoneInfo.Local));
