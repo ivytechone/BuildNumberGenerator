@@ -1,4 +1,3 @@
-using BuildNumberGenerator.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuildNumberGenerator.Controllers
@@ -23,12 +22,13 @@ namespace BuildNumberGenerator.Controllers
         {
             Identity? id = AuthenticationHelper.GetAuthenticatedIdentity(this.HttpContext);
 
-            if (id is null) // [UseAuthorization] should set this
+            if (id is null || id.Id is null) // [UseAuthorization] should set this
             {
                 throw new ArgumentNullException("id");
             }
+            
+            return new OkObjectResult(_generator.GetNextBuildNumber(id.Id, "", TimeZoneInfo.Utc));
 
-            return new OkObjectResult(_generator.GetNextBuildNumber(id.Id, ""));
         }
 
         [HttpGet]
