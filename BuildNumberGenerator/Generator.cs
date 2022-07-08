@@ -10,7 +10,7 @@ namespace BuildNumberGenerator
 
         public string GetNextBuildNumber(string id, string branch)
         {
-            return "Hello World";
+            return $"Hello World {id}";
         }
     }
 }

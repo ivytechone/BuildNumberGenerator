@@ -23,9 +23,7 @@ namespace BuildNumberGenerator
 				var Identity = AuthenticationHelper.GetAuthenticatedIdentity(context);
 
 				if (Identity is not null &&
-					!string.IsNullOrEmpty(Identity.Id) &&
-					Identity.Scopes is not null &&
-					Identity.Scopes.Contains("admin"))
+					!string.IsNullOrEmpty(Identity.Id))
 				{
 					await _requestDelegate(context);
 				}
