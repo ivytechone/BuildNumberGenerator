@@ -61,5 +61,29 @@ public class GeneratorTests
         
         timeProvider.SetMockTimeUTC(UTCTime.AddMinutes(1));
         Assert.Equal("branch1.20220102.1", generator.GetNextBuildNumber("id1", "branch1", tzPST));
-    }    
+    }
+    
+    [Fact]
+    public void PurgeBuildsTest()
+    {
+        Assert.Equal("branch1.20220101.1", generator.GetNextBuildNumber("id1", "branch1", TimeZoneInfo.Utc));
+        timeProvider.SetMockTimeUTC("2022-01-01T12:10Z");
+        Assert.Equal("branch1.20220101.2", generator.GetNextBuildNumber("id1", "branch1", TimeZoneInfo.Utc));
+        timeProvider.SetMockTimeUTC("2022-01-02T12:01Z"); 
+        Assert.Equal(1, generator.PurgeBuilds());
+        Assert.Equal("branch1.20220102.1", generator.GetNextBuildNumber("id1", "branch1", TimeZoneInfo.Utc));    
+        timeProvider.SetMockTimeUTC("2022-01-02T18:00Z");
+        Assert.Equal(0, generator.PurgeBuilds());            
+    }
+
+    [Fact]
+    public void PurgeMultipleBuildsTest()
+    {
+        Assert.Equal("branch1.20220101.1", generator.GetNextBuildNumber("id1", "branch1", TimeZoneInfo.Utc));
+        timeProvider.SetMockTimeUTC("2022-01-02T12:10Z");
+        Assert.Equal("branch1.20220102.1", generator.GetNextBuildNumber("id1", "branch1", TimeZoneInfo.Utc));
+        timeProvider.SetMockTimeUTC("2022-01-03T12:30Z"); 
+        Assert.Equal(2, generator.PurgeBuilds());
+        Assert.Equal(0, generator.PurgeBuilds());     // empty queue        
+    }
 }
