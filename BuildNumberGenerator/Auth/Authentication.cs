@@ -33,10 +33,17 @@ namespace BuildNumberGenerator
 
 				if (token is not null)
 				{
+					if (token.sub is null || token.zoneinfo is null)
+					{
+						context.Response.StatusCode = 401;
+						return;
+					}
+					
 					context.Items[AuthIdentityKey] = new Identity()
 					{
 						Id = token.sub,
-						Scopes = Array.Empty<string>()
+						Scopes = Array.Empty<string>(),
+						TZ = TimeZoneInfo.FindSystemTimeZoneById(token.zoneinfo)
 					};
 					await _requestDelegate(context);
 				}

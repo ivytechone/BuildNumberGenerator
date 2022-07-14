@@ -22,13 +22,13 @@ namespace BuildNumberGenerator.Controllers
         {
             Identity? id = AuthenticationHelper.GetAuthenticatedIdentity(this.HttpContext);
 
-            if (id is null || id.Id is null) // [UseAuthorization] should set this
+            if (id is null || id.Id is null || id.TZ is null) // [UseAuthorization] should set this
             {
                 throw new ArgumentNullException("id");
             }
             
             // hard code to PST for my own testing.
-            return new OkObjectResult(_generator.GetNextBuildNumber(id.Id, branch, TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles")));
+            return new OkObjectResult(_generator.GetNextBuildNumber(id.Id, branch, id.TZ));
 
         }
 
