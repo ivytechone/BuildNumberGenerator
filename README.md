@@ -27,4 +27,4 @@ This uses an anonymous identity token, which can be obtained with
 
 To generate a build number run:
 
-> curl --header --header "Authorization: Bearer $TOKEN" https://apps.test.ivytech.one/buildnumgenerator/getBuildNumber?branch=main
+> curl --header "Authorization: Bearer $TOKEN" https://apps.test.ivytech.one/buildnumgenerator/getBuildNumber?branch=main
