@@ -17,7 +17,12 @@ If I then build merge that branch and build main I get
 
 > main.20220706.1
 
-The ideal is to keep the build numbers small and easy to identify. As of creating this project there few way to generate a unique build number in GitHub actions. $RUNNUMBER is the best option, but this continuouly increments. It is easier if I know there is a issue with the .2 build from today I can easily identify that.
+Building the next day will result
+
+> main.20220707.1
+
+
+The ideal is to keep the build numbers small and easy to work with. As of creating this project there very few ways to generate a unique build number in GitHub actions. $RUNNUMBER is the best option, but this continuouly increments so best we can get is build numbers like main.20220707.267
 
 # Usage
 
@@ -28,3 +33,7 @@ This uses an anonymous identity token, which can be obtained with
 To generate a build number run:
 
 > curl --header "Authorization: Bearer $TOKEN" https://apps.test.ivytech.one/buildnumgenerator/getBuildNumber?branch=main
+
+$TOKEN can be stored as a secert in your github repo. Obtain a different token for each repo. 
+
+Note: This project is currently in test and may not be reliable. I hope to update to production deployment soon. 
