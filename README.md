@@ -18,3 +18,13 @@ If I then build merge that branch and build main I get
 > main.20220706.1
 
 The ideal is to keep the build numbers small and easy to identify. As of creating this project there few way to generate a unique build number in GitHub actions. $RUNNUMBER is the best option, but this continuouly increments. It is easier if I know there is a issue with the .2 build from today I can easily identify that.
+
+# Usage
+
+This uses an anonymous identity token, which can be obtained with
+
+> TOKEN=$(curl --header "x-application-id: 2695BA2C-9C39-4D13-8AC3-B625A0963A19"  https://auth.test.ivytech.one/api/anonymousid)
+
+To generate a build number run:
+
+> curl --header --header "Authorization: Bearer $TOKEN" https://apps.test.ivytech.one/buildnumgenerator/getBuildNumber?branch=main
