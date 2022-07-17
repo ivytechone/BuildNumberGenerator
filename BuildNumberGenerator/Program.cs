@@ -2,6 +2,10 @@ using BuildNumberGenerator;
 using IvyTech.Logging;
 using Serilog;
 
+// App level logging context
+IvyTech.Logging.AppContext.SetAppName("BuildNum");
+IvyTech.Logging.AppContext.SetVersion("1.0");
+
 var builder = WebApplication.CreateBuilder(args);
 var logger = DebugLogger.CreateLogger(builder.Configuration);
 builder.Services.AddLogging(x => x.AddSerilog(logger));
