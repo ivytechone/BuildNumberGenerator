@@ -1,5 +1,5 @@
 # BuildNumberGenerator
-Generates unique build numbers for based on branch and date.
+Generates unique build numbers based on branch name and date.
 
 The goal here is to produce internal build numbers for other projects. The format should be
 
@@ -23,7 +23,7 @@ The ideal is to keep the build numbers small and easy to identify. As of creatin
 
 This uses an anonymous identity token, which can be obtained with
 
-> TOKEN=$(curl --header "x-application-id: 2695BA2C-9C39-4D13-8AC3-B625A0963A19"  https://auth.test.ivytech.one/api/anonymousid)
+> TOKEN=$(curl --header "x-application-id: 2695BA2C-9C39-4D13-8AC3-B625A0963A19" --header "x-timezone:America/Los_Angeles" https://auth.test.ivytech.one/api/anonymousid)
 
 To generate a build number run:
 
