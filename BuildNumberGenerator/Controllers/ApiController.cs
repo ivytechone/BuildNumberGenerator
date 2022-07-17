@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using IvyTech.Logging;
 
 namespace BuildNumberGenerator.Controllers
 {
@@ -22,7 +23,7 @@ namespace BuildNumberGenerator.Controllers
         {
             Identity? id = AuthenticationHelper.GetAuthenticatedIdentity(this.HttpContext);
 
-            if (id is null || id.Id is null || id.TZ is null) // [UseAuthorization] should set this
+            if (id is null || id.Id is null || id.TZ is null) // [UseAuthentication] should set this
             {
                 throw new ArgumentNullException("id");
             }

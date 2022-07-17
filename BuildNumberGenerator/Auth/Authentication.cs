@@ -1,8 +1,8 @@
-﻿using JWT;
+﻿using IvyTech.Logging;
+using Microsoft.AspNetCore.Http.Features;
+using JWT;
 using JWT.Algorithms;
 using JWT.Builder;
-using Microsoft.AspNetCore.Http.Features;
-using System.Security.Cryptography.X509Certificates;
 
 namespace BuildNumberGenerator
 {
@@ -13,16 +13,22 @@ namespace BuildNumberGenerator
 	public class AuthenticationHelper
 	{
 		private readonly RequestDelegate _requestDelegate;
-
+		private readonly ILogger<AuthenticationHelper> _logger;
+		private readonly ICertificateManager _certManager;
 		public static readonly string AuthIdentityKey = "Auth_Identity";
 
-		public AuthenticationHelper(RequestDelegate requestDelegate)
+
+		public AuthenticationHelper(RequestDelegate requestDelegate, ILogger<AuthenticationHelper> logger, ICertificateManager certManager)
 		{
 			_requestDelegate = requestDelegate;
+			_logger = logger;
+			_certManager = certManager;
 		}
 
 		public async Task InvokeAsync(HttpContext context)
 		{
+			var requestLoggerContext = context.GetRequestLoggerContext();
+
 			if (!HasUseAuthenticationAttribute(context))
 			{
 				await _requestDelegate(context);
@@ -35,6 +41,8 @@ namespace BuildNumberGenerator
 				{
 					if (token.sub is null || token.zoneinfo is null)
 					{
+						_logger.LogWarning("Token not valid");
+						requestLoggerContext.Diag = DiagCodes.AuthFailed;
 						context.Response.StatusCode = 401;
 						return;
 					}
@@ -49,6 +57,8 @@ namespace BuildNumberGenerator
 				}
 				else
 				{
+					_logger.LogWarning("Token missing or invalid");
+					requestLoggerContext.Diag = DiagCodes.AuthFailed;		
 					context.Response.StatusCode = 401;
 					return;
 				}
@@ -71,30 +81,21 @@ namespace BuildNumberGenerator
 				return null;
 			}
 
-			var cert = X509Certificate2.CreateFromPem("-----BEGIN CERTIFICATE-----MIIDPzCCAiegAwIBAgIUWifwuXU9yzt6q60JysRzmtTUaywwDQYJKoZIhvcNAQELBQAwLzELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAldBMRMwEQYDVQQKDApJdnlUZWNoT25lMB4XDTIyMDcwNTIzMzc1NVoXDTMyMDcwMjIzMzc1NVowLzELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAldBMRMwEQYDVQQKDApJdnlUZWNoT25lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA147qimzSX/F+SqqsAQvanerkULig/TNOH/4ytEzuf6MEFVk8YPckx1da3VtmyodD7aT2vDKqA/R8i2ehFswkgT+CKH7sTxuOp+DGsK3GAeIPS2NHodOq9spp9CuEVmZZGVwZNiRTvTp1iDr6bPkp5gDZ+9MaPsssyfKK3HJXq2bDT63v2UQ57jbZtfRgSZpTJZTsjJIoS+iAfzoNWbyNgf1oZy8jh5TqjY+bg26hLNPoB8q3ef5Opx6nG9kWaWfPrH5FR77yVv5eIMvzXhh3FfbLV9hvhyshwye28PjNV3E1qwKWd8/TS9/69exR/NVJYqYHAsjFy+TYv4NBN3BtUwIDAQABo1MwUTAdBgNVHQ4EFgQUYWKu/Cb9BSJVcG2jALmis+hYUygwHwYDVR0jBBgwFoAUYWKu/Cb9BSJVcG2jALmis+hYUygwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAqnx0Ovul1KyM5YTMwtgv8489QawskajT1K8FoS+KBLLGZozg6rp4lzcZU2dq0p0Ue+AYTKEyKJtQM77a2C+dO9L2tHe06sAcQwSlL/pqw7c7p+Wzi9zm2SoCU20YwTnUtUb0fR9bRK4CRm4IhSwl4wpNQK43cTkFhLW3MOgNoo7GktjyHUeQEtpMUp9XsnZ1o/Ig5Y9VkrKDnU5Be+EG7SnyEnCFMmeeIsru4VSDdbNom73qb+UgKA7cAaKc/O05us2x2i2+QIaxUpjDhc4AqaAsGeQ73aOy5FR5BG1SfpDc9QoX9ASaOuWrRXkWLp52fAG4pWlaGhF+ey8tvJlLew==-----END CERTIFICATE-----");
+			var cert = _certManager.GetAidCertificate();
 
-			try
-			{
-				var token = JwtBuilder.Create()
-					.WithAlgorithm(new RS256Algorithm(cert))
-					.WithValidationParameters(ValidationParameters.Default)
-					.Decode<Token>(authorizationHeader.Substring(7));
+			var token = JwtBuilder.Create()
+				.WithAlgorithm(new RS256Algorithm(cert))
+				.WithValidationParameters(ValidationParameters.Default)
+				.Decode<Token>(authorizationHeader.Substring(7));
 				
-				if (token.iss == "ivytech.one" && token.aud == "2695BA2C-9C39-4D13-8AC3-B625A0963A19")
-				{
-					return token;
-				}
-				else
-				{
-					return null;
-				}
+			if (token.iss == "ivytech.one" && token.aud == "2695BA2C-9C39-4D13-8AC3-B625A0963A19")
+			{
+				return token;
 			}
-			catch (Exception)
+			else
 			{
 				return null;
 			}
-
-			
 		}
 
 		public static Identity? GetAuthenticatedIdentity(HttpContext context)
