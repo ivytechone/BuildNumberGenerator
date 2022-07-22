@@ -7,9 +7,9 @@ namespace BuildNumberGenerator
 	/// </summary>
 	public class StaticCertManager : ICertificateManager
 	{
-		private readonly StaticCertManagerConfig _config;
+		private readonly IStaticCertManagerConfig _config;
 
-		public StaticCertManager(StaticCertManagerConfig config)
+		public StaticCertManager(IStaticCertManagerConfig config)
 		{
 			if (config == null || String.IsNullOrWhiteSpace(config.aidCertPem))
 			{

@@ -1,29 +1,17 @@
 namespace BuildNumberGenerator
 {
-    class BuildNumber
-    {
-        public BuildNumber(string id, DateTime buildTime)
-        {
-            Id = id;
-            Number = 1;
-            BuildTime = buildTime;
-        }
-
-        public int Number {get; set;}
-        public string Id {get; private set;}
-        public DateTime BuildTime {get;set;}  // Always UTC
-    }
-
     public class Generator : IGenerator
     {
         private readonly ITimeProvider _timeProvider;
-        private Dictionary<string, BuildNumber> _builds;
-        private Queue<BuildNumber> _buildQueue;
+        private readonly Dictionary<string, BuildNumber> _builds;
+        private readonly Queue<BuildNumber> _buildQueue;
+        private readonly IBuildNumberArchiver? _archiver;
         private readonly object _sync;
 
-        public Generator(ITimeProvider timeProvider)
+        public Generator(ITimeProvider timeProvider, IBuildNumberArchiver? archiver)
         {
             _timeProvider = timeProvider;
+            _archiver = archiver;
             _builds = new Dictionary<string, BuildNumber>();
             _buildQueue = new Queue<BuildNumber>();
             _sync = new Object();
@@ -57,7 +45,7 @@ namespace BuildNumberGenerator
             {
                 if (!_builds.TryGetValue(buildKey, out buildNumber))
                 {
-                    buildNumber = new BuildNumber(buildKey, currentTimeUTC);
+                    buildNumber = new BuildNumber(buildKey, branch, currentTimeUTC);
                     _builds.Add(buildKey, buildNumber);  
                     _buildQueue.Enqueue(buildNumber);    
                 }
@@ -66,7 +54,7 @@ namespace BuildNumberGenerator
                     buildNumber.Number++;
                 }
             }
-
+            _archiver?.Queue(buildNumber);
             return $"{buildKey.Substring(buildKey.IndexOf('.')+1)}.{buildNumber.Number}";
         }
 

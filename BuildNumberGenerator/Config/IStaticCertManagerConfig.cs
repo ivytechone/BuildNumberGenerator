@@ -1,6 +1,6 @@
 namespace BuildNumberGenerator
 {
-	public class StaticCertManagerConfig : IStaticCertManagerConfig
+	public interface IStaticCertManagerConfig
 	{
 		public string? aidCertPem { get; set; }
     }

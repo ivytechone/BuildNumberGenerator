@@ -28,8 +28,11 @@ namespace BuildNumberGenerator.Controllers
                 throw new ArgumentNullException("id");
             }
             
-            // hard code to PST for my own testing.
-            return new OkObjectResult(_generator.GetNextBuildNumber(id.Id, branch, id.TZ));
+
+            var result = _generator.GetNextBuildNumber(id.Id, branch, id.TZ);
+            _logger.LogInformation("{result}", result);
+
+            return new OkObjectResult(result);
 
         }
 

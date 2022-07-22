@@ -8,10 +8,16 @@ IvyTech.Logging.AppContext.SetVersion("1.0");
 
 var builder = WebApplication.CreateBuilder(args);
 var logger = DebugLogger.CreateLogger(builder.Configuration);
+
 builder.Services.AddLogging(x => x.AddSerilog(logger));
-builder.Services.AddSingleton<ICertificateManager>(x => new StaticCertManager(builder.Configuration.GetSection("StaticCertManager").Get<StaticCertManagerConfig>()));
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IGenerator>(x => new Generator(new TimeProvider()));
+builder.Services.AddSingleton<IBuildNumberArchiverConfig>(x => builder.Configuration.GetSection("BuildNumberArchiverConfig").Get<BuildNumberArchiverConfig>());
+builder.Services.AddSingleton<IStaticCertManagerConfig>(x => builder.Configuration.GetSection("StaticCertManager").Get<StaticCertManagerConfig>());
+builder.Services.AddSingleton<ICertificateManager, StaticCertManager>();
+builder.Services.AddSingleton<IBuildNumberArchiver, BuildNumberArchiver>();
+builder.Services.AddSingleton<ITimeProvider, TimeProvider>();
+builder.Services.AddSingleton<IGenerator, Generator>();
+builder.Services.AddHostedService<BackgroundWorker>();
 var app = builder.Build();
 app.MapControllers();
 app.UseIvyLogging();

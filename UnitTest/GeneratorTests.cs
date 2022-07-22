@@ -7,7 +7,7 @@ public class GeneratorTests
     public GeneratorTests(ITestOutputHelper output)
     {
         timeProvider = new MockTimeProvider("2022-01-01T12:00Z");
-        generator = new Generator(timeProvider);
+        generator = new Generator(timeProvider, null);
     }
 
     private readonly IGenerator generator;

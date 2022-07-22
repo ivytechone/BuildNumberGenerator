@@ -9,6 +9,8 @@
   <ItemGroup>
     <PackageReference Include="JWT" Version="9.0.3" />
     <PackageReference Include="IvyLogging" Version="1.0.0" />
+    <PackageReference Include="BatchSender" Version="1.0.0" />
+    <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.0.0-beta.1" />
   </ItemGroup>
 
 </Project>
